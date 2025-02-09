@@ -3,8 +3,8 @@ import pandas as pd
 import re
 
 # Pfade zu den Dateien
-excel_file = r"C:\Users\demlotter\OneDrive - Brenntag\Datasphere\CLI Development\Python Files\Source Metadata.xlsx"  # Excel-Datei
-json_file  = r"C:\Users\demlotter\OneDrive - Brenntag\Datasphere\CLI Development\Python Files\Target JSON.json"      # JSON-Datei
+excel_file = r"C:\Users\demlotter\OneDrive - Brenntag\Datasphere\CLI Development\Python Workspace\datasphere\datasphere-tools\Local Tests\Source Data.xlsx"  # Excel-Datei
+json_file  = r"C:\Users\demlotter\OneDrive - Brenntag\Datasphere\CLI Development\Python Workspace\datasphere\datasphere-tools\Local Tests\Target Data.json"   # JSON-Datei
 
 # Excel-Datei einlesen (angenommen, sie hat Spalten "key" und "value")
 df = pd.read_excel(excel_file)
