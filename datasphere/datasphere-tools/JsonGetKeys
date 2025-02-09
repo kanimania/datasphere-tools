@@ -1,0 +1,45 @@
+import json
+import pandas
+import re
+
+json_file = r"C:\Users\demlotter\OneDrive - Brenntag\Datasphere\CLI Development\Python Files\Target JSON.json"  # JSON-Datei
+
+# JSON-Datei einlesen
+with open(json_file, 'r', encoding='utf-8') as f:
+    json_data = json.load(f)
+
+# print("Original Json: " + str(json_data))
+
+def search_json(data, pattern, parent_key=""):
+    # Wenn data ein Dictionary ist
+    if isinstance(data, dict):
+        for key, value in data.items():
+            # Erstelle den vollständigen Schlüsselpfad
+            full_key = f"{parent_key}.{key}" if parent_key else key
+            
+            # Prüfen, ob der aktuelle Schlüssel zur Wildcard passt
+            if re.search(pattern, full_key):  # `re.search` sucht nach Übereinstimmungen überall im String
+                yield full_key, value  # Wenn der Schlüssel übereinstimmt, gebe ihn und den Wert zurück
+
+            # Rekursiver Aufruf, falls der Wert ein Dictionary oder eine Liste ist
+            if isinstance(value, (dict, list)):
+                yield from search_json(value, pattern, full_key)  # Übergib den aktuellen Schlüssel als Elternpfad
+    
+    # Wenn data eine Liste ist, iteriere durch die Liste
+    elif isinstance(data, list):
+        for idx, item in enumerate(data):
+            # Erstelle einen neuen Schlüsselpfad für Listen, indem der Index hinzugefügt wird
+            full_key = f"{parent_key}[{idx}]"
+            yield from search_json(item, pattern, full_key)
+
+# Beispiel-Wildcard-Suche nach `@EndUserText.label`
+# pattern = r"@EndUserText\.label"  # Sucht nach allen Vorkommen von @EndUserText.label
+# pattern = r"elements\..*\.@EndUserText\.label"
+pattern = r"Column1\.@EndUserText\.label"
+matches = search_json(json_data, pattern)
+
+# Ausgabe der gefundenen Schlüssel und Werte
+for key, value in matches:
+    print(f"Gefunden: {key} -> {value}")
+
+    print(json_data['definitions']['TEST_CLI']['elements']['Column1']['@EndUserText.label'])

@@ -1,0 +1,31 @@
+import pandas as pd
+import json
+
+json_file = r"C:\Users\demlotter\OneDrive - Brenntag\Datasphere\CLI Development\Python Files\Target JSON.json"  # JSON-Datei
+
+# JSON-Datei einlesen
+with open(json_file, 'r', encoding='utf-8') as f:
+    json_data = json.load(f)
+
+# print(json_data)
+# print(json_data["definitions"]["TEST_CLI"]["elements"]["Column1"]["@EndUserText.label"])
+
+# Dynamisch
+def get_label_value(data, key):
+    keys = key.split(';')  # Der Schlüssel könnte durch Punkte getrennt sein
+    for k in keys:
+        if k in data:
+            data = data[k]
+            # print(k)
+            # print(data)
+        else:
+            return None  # Falls der Schlüssel nicht existiert
+    return data
+
+# Beispiel: Zugriff auf `@EndUserText.label` in `Column1`
+label_value = get_label_value(json_data, "definitions;TEST_CLI;elements;Column1;@EndUserText.label")
+print(label_value)  # Ausgabe: Test CLI2
+
+# # # Beispiel: Zugriff auf `@EndUserText.label` in `Test ClI`
+# column_label_value = get_label_value(json_data, "definitions;TEST_CLI;@EndUserText.label")
+# print(column_label_value)  # Ausgabe: Column CLI

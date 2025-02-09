@@ -1,0 +1,54 @@
+# Angenommene JSON-Daten
+json_data = {
+    "definitions": {
+        "TEST_CLI": {
+            "kind": "entity",
+            "@ObjectModel.modelingPattern": {
+                "#": "DATA_STRUCTURE"
+            },
+            "@ObjectModel.supportedCapabilities": [
+                {
+                    "#": "DATA_STRUCTURE"
+                }
+            ],
+            "@EndUserText.label": "Test CLI2",
+            "elements": {
+                "Column1": {
+                    "type": "cds.Decimal",
+                    "precision": 38,
+                    "scale": 19,
+                    "@EndUserText.label": "Column CLI"
+                }
+            }
+        }
+    }
+}
+
+# Zugriff auf den Wert von `@EndUserText.label` in `TEST_CLI`
+label_value = json_data["definitions"]["TEST_CLI"]["@EndUserText.label"]
+print(label_value)  # Ausgabe: Test CLI2
+
+def get_label_value(data, key):
+    # keys = key.split('.')  # Der Schlüssel könnte durch Punkte getrennt sein
+    # Temporäre Ersetzung des @EndUserText.label mit einem Platzhalter
+    temp_key = key.replace('@EndUserText.label', '@EndUserText_label')
+    
+    # Splitte den Schlüssel nach Punkten, aber ignoriere @EndUserText_label
+    keys = temp_key.split('.')
+    
+    # Stelle sicher, dass wir den Platzhalter wieder in @EndUserText.label umwandeln
+    keys = [key.replace('@EndUserText_label', '@EndUserText.label') for key in keys]
+    for k in keys:
+        if k in data:
+            data = data[k]
+        else:
+            return None  # Falls der Schlüssel nicht existiert
+    return data
+
+# Beispiel: Zugriff auf `@EndUserText.label` in `TEST_CLI`
+label_value = get_label_value(json_data, "definitions.TEST_CLI.@EndUserText.label")
+print(label_value)  # Ausgabe: Test CLI2
+
+# Beispiel: Zugriff auf `@EndUserText.label` in `Column1`
+column_label_value = get_label_value(json_data, "definitions.TEST_CLI.elements.Column1.@EndUserText.label")
+print(column_label_value)  # Ausgabe: Column CLI
