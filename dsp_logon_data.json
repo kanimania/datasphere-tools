@@ -1,7 +1,0 @@
-{
-    "client_id": "something",
-    "client_secret": "something",
-    "authorization_url": "https://something/oauth/authorize",
-    "token_url": "https://something.hana.ondemand.com/oauth/token",
-    "dsp_host": "https://something.cloud.sap/"
-  }
