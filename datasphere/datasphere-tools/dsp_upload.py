@@ -22,6 +22,7 @@ dsp_upload_file = r"datasphere\datasphere-tools\Local Tests\Target Data.json"
 # subprocess.run(command, shell=True)
 
 # Run datasphere-cli command (dynamic)
+# dsp_object_type = input("Please provide the object type [local_tables] [replication_flows] : ")
 # dsp_space = input("Please provide the space name : ")
 # dsp_update_type = input("Please provide the update type [create] [update] : ")
 # dsp_technical_name = input("Please provide the technical-name : ")
