@@ -1,5 +1,5 @@
 /Local Tests/
 /Templates/
 dsp_logon_data.json
-/DSP_Json_Downloads/*
-!/DSP_Json_Downloads/.gitkeep
+/dsp_downloads/*
+!/dsp_downloads/.gitkeep
