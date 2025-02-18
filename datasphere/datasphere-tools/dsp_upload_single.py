@@ -17,6 +17,9 @@ dsp_host  = json_data["dsp_host"]
 # Default upload file
 dsp_upload_file = r"datasphere\datasphere-tools\Local Tests\Target Data.json"
 
+# Test
+subprocess.run('datasphere -h', shell=True)
+
 # Run datasphere-cli command (static)
 # command = f'datasphere objects local_tables create --technical-name TEST_CLI --space PLAYGROUND --file-path {dsp_upload_file} --verbose'
 # subprocess.run(command, shell=True)
