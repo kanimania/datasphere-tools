@@ -15,10 +15,15 @@ except Exception as e:
 dsp_host  = json_data["dsp_host"]
 
 # Default upload file
+# dsp_upload_file = r"C:\Users\demlotter\OneDrive - Brenntag\Datasphere\CLI Development\Python Workspace\datasphere\datasphere-tools\Local Tests\Target Data.json"
+# dsp_technical_name = input("Please provide a technical name : ")
+dsp_technical_name = "TEST_CLI"
 dsp_upload_file = r"datasphere\datasphere-tools\Local Tests\Target Data.json"
 
 # Test
-subprocess.run('datasphere -h', shell=True)
+command = f'datasphere objects local-tables create --technical-name {dsp_technical_name} --space PLAYGROUND --file-path "{dsp_upload_file}" --verbose'
+subprocess.run(command, shell=True)
+print(command)
 
 # Run datasphere-cli command (static)
 # command = f'datasphere objects local_tables create --technical-name TEST_CLI --space PLAYGROUND --file-path {dsp_upload_file} --verbose'
