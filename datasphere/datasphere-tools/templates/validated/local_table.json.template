@@ -1,0 +1,24 @@
+{
+  "definitions": {
+    "DUMMY_TABLE_NAME": {
+      "kind": "entity",
+      "@ObjectModel.modelingPattern": {
+        "#": "DATA_STRUCTURE"
+      },
+      "@ObjectModel.supportedCapabilities": [
+        {
+          "#": "DATA_STRUCTURE"
+        }
+      ],
+      "@EndUserText.label": "DUMMY_TABLE_TEXT",
+      "elements": {
+        "DUMMY_COLUMN": {
+          "type": "DUMMY_TYPE",
+          "precision": 0,
+          "scale": 0,
+          "@EndUserText.label": "DUMMY_COLUMN_TEXT"
+        }
+      }
+    }
+  }
+}

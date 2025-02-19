@@ -1,0 +1,59 @@
+{
+  "definitions": {
+    "local_delta_table_Delta": {
+      "kind": "entity",
+      "@EndUserText.label": "local_delta_table",
+      "@ObjectModel.modelingPattern": {
+        "#": "DATA_STRUCTURE"
+      },
+      "@ObjectModel.supportedCapabilities": [
+        {
+          "#": "DATA_STRUCTURE"
+        }
+      ],
+      "@DataWarehouse.delta": {
+        "type": {
+          "#": "UPSERT"
+        },
+        "dateTimeElement": {
+          "=": "Change_Date"
+        },
+        "modeElement": {
+          "=": "Change_Type"
+        }
+      },
+      "@DataWarehouse.enclosingObject": "local_delta_table",
+      "elements": {
+        "Column_1": {
+          "@EndUserText.label": "Column 1",
+          "type": "cds.String",
+          "length": 100,
+          "key": true,
+          "notNull": true
+        },
+        "Change_Type": {
+          "@EndUserText.label": "Change Type",
+          "type": "cds.String",
+          "length": 1,
+          "notNull": true,
+          "default": {
+            "val": "I"
+          }
+        },
+        "Change_Date": {
+          "@EndUserText.label": "Change Date",
+          "type": "cds.Timestamp",
+          "notNull": true,
+          "default": {
+            "func": "CURRENT_UTCTIMESTAMP"
+          }
+        }
+      },
+      "_meta": {
+        "dependencies": {
+          "folderAssignment": "Folder_IOOEJXOV"
+        }
+      }
+    }
+  }
+}

@@ -1,5 +1,7 @@
-/Local Tests/
-/Templates/
+/local Tests/
+/templates/**
+!/templates/**/
+!/templates/validated/*
 dsp_logon_data.json
 /dsp_files/**
 !/dsp_files/**/
