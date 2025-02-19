@@ -17,11 +17,12 @@ dsp_host  = json_data["dsp_host"]
 # Default upload file
 # dsp_upload_file = r"C:\Users\demlotter\OneDrive - Brenntag\Datasphere\CLI Development\Python Workspace\datasphere\datasphere-tools\Local Tests\Target Data.json"
 # dsp_technical_name = input("Please provide a technical name : ")
-dsp_technical_name = "TEST_CLI"
-dsp_upload_file = r"datasphere\datasphere-tools\Local Tests\Target Data.json"
+dsp_technical_name = "TEST_0CUSTOMER_TEXT"
+dsp_file_path = r"datasphere\datasphere-tools\dsp_files\dsp_uploads"
+dsp_upload_file = r"local_delta_table.json"
 
 # Test
-command = f'datasphere objects local-tables create --technical-name {dsp_technical_name} --space PLAYGROUND --file-path "{dsp_upload_file}" --verbose'
+command = f'datasphere objects local-tables create --technical-name {dsp_technical_name} --space PLAYGROUND --file-path "{dsp_file_path}\\{dsp_upload_file}" --verbose'
 subprocess.run(command, shell=True)
 print(command)
 
