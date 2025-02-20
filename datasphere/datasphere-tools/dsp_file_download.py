@@ -1,4 +1,4 @@
 from dsp_utils import dspUtils as du
 
 # du.logoutlogin() --> If required
-du.download()
+du.download_json()
