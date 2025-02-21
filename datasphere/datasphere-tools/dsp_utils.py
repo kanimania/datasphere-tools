@@ -2,41 +2,9 @@ import subprocess
 import json
 import pandas as pd
 import re
+import inquirer
 
 class dspUtils:
-
-    def download_json():
-        dsp_output_path = r"datasphere\datasphere-tools\dsp_files\dsp_downloads"
-        dsp_technical_name = input("Please provide a technical name : ")
-        dsp_object_type = input("Please provide an object type[default: local-tables] : ").strip() or 'local-tables'
-        dsp_space = input("Please provide a space name[default: INGESTION_001] : ").strip() or 'INGESTION_001'
-        dsp_accept = input("Please provide accept parameter[optional] : ") 
-            # E.g.: 
-            # "application/vnd.sap.datasphere.object.content+json"             (default)
-            # "application/vnd.sap.datasphere.object.content.design-time+json" (Includes _meta information like folder dependency)
-            # "application/vnd.sap.datasphere.object.content.run-time+json"    (like default)
-
-        if dsp_accept:
-            command = f'datasphere objects {dsp_object_type}  read --technical-name {dsp_technical_name} --space {dsp_space} --accept {dsp_accept} --output "{dsp_output_path}\\{dsp_technical_name}.json" --verbose'
-            dspUtils.run_command(command)
-        else: 
-            command = f'datasphere objects {dsp_object_type}  read --technical-name {dsp_technical_name} --space {dsp_space} --output "{dsp_output_path}\\{dsp_technical_name}.json" --verbose'
-            dspUtils.run_command(command)
-    
-    def upload_json():
-        dsp_file_path = r"datasphere\datasphere-tools\dsp_files\dsp_uploads"
-        dsp_technical_name = input("Please provide a technical name : ")
-        dsp_space = input("Please provide a space name[default: PLAYGROUND] : ").strip() or 'PLAYGROUND'
-        dsp_object_type = input("Please provide the object type [default: local-tables] : ").strip() or 'local-tables'
-        dsp_crud_type = input("Please provide the update type [create] [update] : ")      
-        dsp_upload_file = input("Please provide a file name : ")
-
-        command = f'datasphere objects {dsp_object_type} {dsp_crud_type} --technical-name {dsp_technical_name} --space {dsp_space} --file-path "{dsp_file_path}\\{dsp_upload_file}" --verbose'
-        print(f'Datasphere command: {command}')
-        if input("Confirm [Y or N]: ") == 'Y':
-            dspUtils.run_command(command)
-        else: 
-            print("Upload canceled")
 
     def run_command(command):
         print(f'Command: {command}')
@@ -81,6 +49,150 @@ class dspUtils:
 
         # Optional command to debug or to get the access and refresh token to avoid login command (see header comments)
         dspUtils.run_command('datasphere config secrets show')
+
+    def download_json():
+        dsp_output_path = r"datasphere\datasphere-tools\dsp_files\dsp_downloads"
+        dsp_technical_name = input("Please provide a technical name : ")
+        dsp_object_type = input("Please provide an object type[default: local-tables] : ").strip() or 'local-tables'
+        dsp_space = input("Please provide a space name[default: INGESTION_001] : ").strip() or 'INGESTION_001'
+        dsp_accept = input("Please provide accept parameter[optional] : ") 
+            # E.g.: 
+            # "application/vnd.sap.datasphere.object.content+json"             (default)
+            # "application/vnd.sap.datasphere.object.content.design-time+json" (Includes _meta information like folder dependency)
+            # "application/vnd.sap.datasphere.object.content.run-time+json"    (like default)
+
+        if dsp_accept:
+            command = f'datasphere objects {dsp_object_type}  read --technical-name {dsp_technical_name} --space {dsp_space} --accept {dsp_accept} --output "{dsp_output_path}\\{dsp_technical_name}.json" --verbose'
+        else: 
+            command = f'datasphere objects {dsp_object_type}  read --technical-name {dsp_technical_name} --space {dsp_space} --output "{dsp_output_path}\\{dsp_technical_name}.json" --verbose'
+
+        dspUtils.run_command(command)
+
+    def download_json_interactive():
+        dsp_output_path = r"datasphere\datasphere-tools\dsp_files\dsp_downloads"
+
+        # Interactive Terminal prompts with menu selection via arrow keys on keyboard
+        dsp_technical_name = inquirer.prompt(
+            [
+                inquirer.Text(
+                    "dsp_technical_name", message="Please provide a technical name"
+                )
+            ]
+        )["dsp_technical_name"]
+
+        dsp_object_type = inquirer.prompt(
+            [
+                inquirer.List(
+                    "dsp_object_type",
+                    message="Please provide an object type",
+                    choices=[
+                        "local-tables",
+                        "replication-flows",
+                        "transformation-flows",
+                    ],
+                    default="local-tables",
+                )
+            ]
+        )["dsp_object_type"]
+
+        dsp_space = inquirer.prompt(
+            [
+                inquirer.List(
+                    "dsp_space",
+                    message="Please provide a space name",
+                    choices=[
+                        "INGESTION_001",
+                        "OUTBOUND_001",
+                        "PLAYGROUND",
+                    ],
+                    default="INGESTION_001",
+                )
+            ]
+        )["dsp_space"]
+
+        dsp_accept = inquirer.prompt(
+            [
+                inquirer.List(
+                    "dsp_accept",
+                    message="Please provide accept parameter (optional)",
+                    choices=[
+                        "None",  # Easy selection. In the background Datasphere uses its default
+                        "application/vnd.sap.datasphere.object.content+json", # Default used in Datasphere
+                        "application/vnd.sap.datasphere.object.content.design-time+json",
+                        "application/vnd.sap.datasphere.object.content.run-time+json",
+                    ],
+                    default="None",
+                )
+            ]
+        )["dsp_accept"]
+
+        if dsp_accept != "None":
+            command = f'datasphere objects {dsp_object_type} read --technical-name {dsp_technical_name} --space {dsp_space} --accept {dsp_accept} --output "{dsp_output_path}\\{dsp_technical_name}.json" --verbose'
+        else:
+            command = f'datasphere objects {dsp_object_type} read --technical-name {dsp_technical_name} --space {dsp_space} --output "{dsp_output_path}\\{dsp_technical_name}.json" --verbose'
+
+        dspUtils.run_command(command)
+
+    def upload_json():
+        dsp_file_path = r"datasphere\datasphere-tools\dsp_files\dsp_uploads"
+        dsp_technical_name = input("Please provide a technical name : ")
+        dsp_space = input("Please provide a space name[default: PLAYGROUND] : ").strip() or 'PLAYGROUND'
+        dsp_object_type = input("Please provide the object type [default: local-tables] : ").strip() or 'local-tables'
+        dsp_crud_type = input("Please provide the update type [create] [update] : ")      
+        dsp_upload_file = input("Please provide a file name : ")
+
+        command = f'datasphere objects {dsp_object_type} {dsp_crud_type} --technical-name {dsp_technical_name} --space {dsp_space} --file-path "{dsp_file_path}\\{dsp_upload_file}" --verbose'
+        print(f'Datasphere command: {command}')
+        if input("Confirm [Y or N]: ") == 'Y':
+            dspUtils.run_command(command)
+        else: 
+            print("Upload canceled")
+
+    def upload_json_interactive():
+        dsp_file_path = r"datasphere\datasphere-tools\dsp_files\dsp_uploads"
+
+        # Interactive Terminal prompts with menu selection via arrow keys on keyboard
+        dsp_technical_name = inquirer.prompt([
+            inquirer.Text('dsp_technical_name', message="Please provide a technical name")
+        ])['dsp_technical_name']
+        
+        dsp_space = inquirer.prompt([
+            inquirer.List('dsp_space',
+                        message="Please provide a space name",
+                        choices=['PLAYGROUND', 'INGESTION_001', 'OUTBOUND_001'],
+                        default='PLAYGROUND')
+        ])['dsp_space']
+        
+        dsp_object_type = inquirer.prompt([
+            inquirer.List('dsp_object_type',
+                        message="Please provide the object type",
+                        choices=['local-tables', 'replication-flows', 'transformation-flows'],
+                        default='local-tables')
+        ])['dsp_object_type']
+        
+        dsp_crud_type = inquirer.prompt([
+            inquirer.List('dsp_crud_type',
+                        message="Please provide the update type",
+                        choices=['create', 'update'],
+                        default='create')
+        ])['dsp_crud_type']
+        
+        dsp_upload_file = inquirer.prompt([
+            inquirer.Text('dsp_upload_file', message="Please provide a file name")
+        ])['dsp_upload_file']
+        
+        command = f'datasphere objects {dsp_object_type} {dsp_crud_type} --technical-name {dsp_technical_name} --space {dsp_space} --file-path "{dsp_file_path}\\{dsp_upload_file}" --verbose'
+        
+        # User confirmation
+        confirm = inquirer.prompt([
+            inquirer.Confirm('confirm', message="Confirm", default=True)
+        ])['confirm']
+        
+        if confirm:
+            print(f'Datasphere command: {command}')
+            subprocess.run(command, shell=True)
+        else:
+            print("Upload canceled")
 
     def read_json_file(json_file):
         try:
