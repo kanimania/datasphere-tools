@@ -7,3 +7,4 @@ dsp_logon_data.json
 !/dsp_files/**/
 !/dsp_files/**/.gitkeep
 /dsp_config/dsp_logon_data.json
+/__pycache__/
