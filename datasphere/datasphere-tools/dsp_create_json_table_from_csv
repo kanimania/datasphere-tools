@@ -1,0 +1,9 @@
+from dsp_utils import dspUtils as du
+
+csv_file = r"datasphere\datasphere-tools\dsp_files\dsp_source_metadata\B25_Export_Metadata_ZDS_AGR_USERS.csv"  # CSV-File
+json_file = r"datasphere\datasphere-tools\local tests\New.json" # Json-File
+
+json_data = du.create_lt_from_csv(csv_file)
+
+# Ergebnis speichern oder ausgeben
+du.write_json_file(json_data, json_file)

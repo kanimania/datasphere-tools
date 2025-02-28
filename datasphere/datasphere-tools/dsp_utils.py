@@ -3,6 +3,8 @@ import json
 import pandas as pd
 import re
 import inquirer
+import csv
+import copy
 
 class dspUtils:
 
@@ -279,3 +281,73 @@ class dspUtils:
             data[keys[-1]] = value
         else:
             raise TypeError(f"Expected a dictionary at the end, but {type(data)} was found at key '{keys[-1]}'")
+        
+    def create_lt_from_csv(csv_file):
+        with open(csv_file, mode="r", encoding="utf-8") as file:
+            reader = csv.DictReader(file, delimiter=";")
+
+            local_table = {
+                "definitions":{
+
+                }
+            }
+
+            for row in reader:
+                tabname = row["TABNAME"]
+                fieldname = row["FIELDNAME"]
+                datatype = row["DATATYPE"]
+                fieldtext = row["FIELDTEXT"]
+                tabname = f"TEST_{tabname}"
+                if tabname not in local_table["definitions"]:
+                    local_table["definitions"][tabname] = {
+                        "kind": "entity",
+                        "@ObjectModel.modelingPattern": {"#": "DATA_STRUCTURE"},
+                        "@ObjectModel.supportedCapabilities": [{"#": "DATA_STRUCTURE"}],
+                        "@EndUserText.label": tabname,
+                        "elements": {},
+                    }
+
+                local_table["definitions"][tabname]["elements"][fieldname] = {
+                    "type": datatype,
+                    "@EndUserText.label": fieldtext,
+                }
+            return local_table
+    
+    def create_json_files_from_csv(csv_file, template_file):
+        tables = {}  # Dictionary für Tabellen-Strukturen
+        json_template = dspUtils.read_json_file(template_file)
+        # CSV-Datei lesen
+        with open(csv_file, mode='r', encoding='utf-8') as file:
+            reader = csv.DictReader(file, delimiter=';')
+
+            for row in reader:
+                tabname = row["TABNAME"]
+                fieldname = row["FIELDNAME"]
+                datatype = row["DATATYPE"]
+                fieldtext = row["FIELDTEXT"]
+
+                # Falls die Tabelle noch nicht existiert, erstelle eine Kopie des Templates
+                if tabname not in tables:
+                    dummy_tabname = list(json_template["definitions"].keys())[0]  # "DUMMY_TABNAME"
+                    tables[tabname] = {
+                        "definitions": {
+                            tabname: copy.deepcopy(json_template["definitions"][dummy_tabname])
+                        }
+                    }
+                    # Setze das Tabellen-Label
+                    tables[tabname]["definitions"][tabname]["@EndUserText.label"] = tabname
+                    # Leere die "elements"-Struktur
+                    tables[tabname]["definitions"][tabname]["elements"] = {}
+
+                # Element zur Tabelle hinzufügen
+                tables[tabname]["definitions"][tabname]["elements"][fieldname] = {
+                    "type": datatype,
+                    "@EndUserText.label": fieldtext
+                }
+
+        # JSON-Dateien für jede Tabelle speichern
+        for tabname, json_data in tables.items():
+            file_name = f"{tabname}.json"
+            with open(file_name, "w", encoding="utf-8") as json_file:
+                json.dump(json_data, json_file, indent=4, ensure_ascii=False)
+            print(f"✅ Datei erstellt: {file_name}")
