@@ -7,4 +7,6 @@ dsp_logon_data.json
 !/dsp_files/**/
 !/dsp_files/**/.gitkeep
 /dsp_config/dsp_logon_data.json
-/__pycache__/
+__pycache__/
+*.pyc
+datasphere\datasphere-tools\__pycache__\dsp_utils.cpython-313.pyc
