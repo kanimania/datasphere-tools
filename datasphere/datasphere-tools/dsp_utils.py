@@ -57,7 +57,7 @@ class dspUtils:
             return None
 
     @staticmethod
-    def download_json_interactive():
+    def download_json():
         dsp_output_path = r"datasphere\datasphere-tools\dsp_files\dsp_downloads"
 
         # Interactive Terminal prompts with menu selection via arrow keys on keyboard
@@ -123,7 +123,7 @@ class dspUtils:
         dspUtils.run_command(command)
 
     @staticmethod
-    def upload_json_interactive():
+    def upload_json():
         dsp_file_path = r"datasphere\datasphere-tools\dsp_files\dsp_uploads"
 
         # Interactive Terminal prompts with menu selection via arrow keys on keyboard
@@ -310,6 +310,31 @@ class dspUtils:
         else:
             print("❌ No data to write.")
             return
+        
+    @staticmethod
+    def update_json_files_from_csv(csv_file, dsp_object_type=None):
+        # File Output Path
+        file_path = r"datasphere/datasphere-tools/local Tests/"
+        # Creates JSON files from a CSV file based on the object type.
+        if dsp_object_type is None:
+            raise ValueError(
+                "No Datasphere object type specified. Please provide a valid type."
+            )
+        # Choose the correct parsing method
+        if dsp_object_type == "LOCAL_TABLE":
+            json_dict = dspUtils.parse_csv_to_json_local_table(csv_file)
+            # If parsing was successful, write each JSON file
+        else:
+            print(f"⚠️ Unknown object type: {dsp_object_type}")
+        # Write Json Files
+        if json_dict:
+            for dsp_object, json_data in json_dict.items():
+                file_name = f"{file_path}{dsp_object}_UPDATE.json"
+                dspUtils.write_json_file(json_data, file_name)
+        else:
+            print("❌ No data to write.")
+            return
+
 
 if __name__ == "__main__":
     csv_file = r"datasphere/datasphere-tools/templates/CSV_Template.csv"
