@@ -3,7 +3,7 @@ import json
 import inquirer
 import csv
 import copy
-
+from pathlib import Path
 
 class dspUtils:
 
@@ -12,7 +12,8 @@ class dspUtils:
         print(f"🔹 Running: {command}")
         result = subprocess.run(command, shell=True, capture_output=True, text=True)
         if result.returncode != 0:
-            print(f"❌ Error executing command: {result.stderr}")
+            print(f"❌ Error executing command: {result.stdout}")
+            print(f"❌ Additional error log: {result.stderr}" ) if result.stderr else None
         else:
             print(f"✅ Command executed successfully: {result.stdout}")
         return result.returncode
@@ -22,7 +23,7 @@ class dspUtils:
         # -----------------------------------------------------------
         # Read host
         # -----------------------------------------------------------
-        dsp_logon_data_file = (
+        dsp_logon_data_file = Path(
             r"datasphere\datasphere-tools\dsp_config\dsp_logon_data.json"
         )
         # dsp_host = dspUtils.read_var_from_file(dsp_logon_data_file,'host')
@@ -120,7 +121,8 @@ class dspUtils:
         else:
             command = f'datasphere objects {dsp_object_type} read --technical-name {dsp_technical_name} --space {dsp_space} --output "{dsp_output_path}\\{dsp_technical_name}.json" --verbose'
 
-        dspUtils.run_command(command)
+        # result = dspUtils.run_command(command)
+        # print(f"✅ File successfully written to: {dsp_output_path}\\{dsp_technical_name}.json") if result == 0 else None
 
     @staticmethod
     def upload_json():
@@ -212,17 +214,19 @@ class dspUtils:
             print(f"❌ An error occurred: {e}")
 
     @staticmethod
-    def read_csv_file(csv_file):
+    def read_csv_file(csv_file: Path) -> list[dict]:
         try:
             with open(csv_file, mode="r", encoding="utf-8") as file:
                 reader = csv.DictReader(file, delimiter=";")
                 return list(reader)  # Store all rows in memory before closing the file
         except FileNotFoundError:
-            print(f"❌ The file {csv_file} was not found.")
-            return None
+            # print(f"❌ The file {csv_file} was not found.")
+            # return None
+            raise FileNotFoundError(f"❌ The file {csv_file} was not found.")
         except csv.Error as e:
-            print(f"❌ CSV Error: {e}")
-            return None
+            # print(f"❌ CSV Error: {e}")
+            # return None
+            raise ValueError(f"❌ CSV Error: {e}")
 
     @staticmethod
     def csv_column_name_translation():
@@ -239,7 +243,7 @@ class dspUtils:
         json_dict = {}  # Dictionary for local_tables
 
         # Define the template file for tables
-        template_file = "datasphere/datasphere-tools/templates/local_table.json"
+        template_file: Path = Path(r"datasphere/datasphere-tools/templates/local_table.json")
         if template_file:
             json_template = dspUtils.read_json_file(template_file)
             if not json_template:
@@ -310,34 +314,54 @@ class dspUtils:
         else:
             print("❌ No data to write.")
             return
-        
+
     @staticmethod
-    def update_json_files_from_csv(csv_file, dsp_object_type=None):
-        # File Output Path
-        file_path = r"datasphere/datasphere-tools/local Tests/"
-        # Creates JSON files from a CSV file based on the object type.
-        if dsp_object_type is None:
-            raise ValueError(
-                "No Datasphere object type specified. Please provide a valid type."
-            )
-        # Choose the correct parsing method
-        if dsp_object_type == "LOCAL_TABLE":
-            json_dict = dspUtils.parse_csv_to_json_local_table(csv_file)
-            # If parsing was successful, write each JSON file
-        else:
-            print(f"⚠️ Unknown object type: {dsp_object_type}")
-        # Write Json Files
+    def update_dsp_column_labels_from_csv(csv_file: Path, json_files: list[str]) -> None:
+        file_path: Path = Path(r"datasphere\datasphere-tools\local tests")
+        json_dict: dict[str, dict] = {}  # Dictionary containing content of json_file(s) for update
+        updated_tables: dict[str, bool] = {}
+
+        # Read CSV File
+        csv_data: list[dict] = dspUtils.read_csv_file(csv_file)
+        csv_columns: dict = dspUtils.csv_column_name_translation()
+
+        # Read Json File(s)
+        for filename in json_files:
+            updated_tables[filename] = False # Logic which deals with existing values in Json but not in CSV
+            file: Path = file_path / filename
+            if not file.exists(): 
+                raise FileNotFoundError(f"❌ File does not exist: {file}") # Redundant? Handling better in read_json_file?
+
+            json_dict[filename] = dspUtils.read_json_file(file)
+            if json_dict[filename] is None:
+                continue
+
+            # filtered_rows: filter = filter(lambda row: f"{row[csv_columns['tabname']]}.json" == filename, csv_data) # Filter CSV File only with matching Json Tables
+            filtered_rows: list[dict] = [row for row in csv_data if f"{row[csv_columns['tabname']]}.json" == filename] # easier for small CSV'S and returns list
+            for row in filtered_rows:
+
+                tablename: str = row[csv_columns["tabname"]]
+                fieldname: str = row[csv_columns["fieldname"]]
+                fieldtext: str = row[csv_columns["fieldtext"]]
+
+                if f"{tablename}.json" not in json_dict: # Logic which deals with existing values in CSV but not in Json
+                    continue
+                if tablename in json_dict[f"{tablename}.json"]["definitions"]: # .get("definitions", {}):
+                    # elements = json_dict[f"{tablename}.json"]["definitions"][tablename].setdefault("elements", {})
+                    elements = json_dict[f"{tablename}.json"]["definitions"][tablename]["elements"]
+                    if fieldname in elements:
+                        print(f"🔄 Updating field {fieldname} in {tablename}.json")
+                        elements[fieldname]["@EndUserText.label"] = fieldtext
+                        updated_tables[f"{tablename}.json"] = True
+
         if json_dict:
-            for dsp_object, json_data in json_dict.items():
-                file_name = f"{file_path}{dsp_object}_UPDATE.json"
-                dspUtils.write_json_file(json_data, file_name)
+            for file, json_data in json_dict.items():
+                if updated_tables[file] == True:
+                    file_name: Path = file_path / file.replace(".json", "_updated.json")
+                    dspUtils.write_json_file(json_data, file_name)
         else:
             print("❌ No data to write.")
-            return
-
 
 if __name__ == "__main__":
-    csv_file = r"datasphere/datasphere-tools/templates/CSV_Template.csv"
-    template_file = r"datasphere/datasphere-tools/templates/local_table.json"
-
-    dspUtils.create_json_files_from_csv(csv_file, dsp_object_type="LOCAL_TABLE")
+    csv_file: Path = Path(r"datasphere/datasphere-tools/templates/CSV_Template.csv")
+    dspUtils.update_dsp_column_labels_from_csv(csv_file, ["TEST_ZOXB250146.json", "TEST_CLuI.json"])

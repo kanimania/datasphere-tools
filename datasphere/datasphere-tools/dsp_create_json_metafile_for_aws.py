@@ -5,7 +5,7 @@ import json
 csv_file = r"C:\temp\B25_Export_Metadata_ZDS_AGR_USERS.csv"  # CSV-File
 # Convert the DataFrame to a Dictionary
 df = du.read_csv_file(csv_file)
-data_dict = df.to_dict(orient='records')
+data_dict = df
 
 # # Convert the DataFrame to a Dictionary
 # csv_dict = csv_data.to_dict(orient='records')
@@ -192,6 +192,5 @@ def update_column_value_from_csv(json_data, table_name, column_name, new_value):
 #     json_template, "DUMMY_TABLE_NAME", new_columns)
 
 # json_data = add_columns_to_elements(json_template, "DUMMY_TABLE_NAME", data_dict)
-json_data = update_column_value_from_csv(json_template, "DUMMY_TABLE_NAME", "AGR_NAME", data_dict)
-
-print(json.dumps(json_data, indent=4))
+json_data = update_column_value_from_csv(json_template, "DUMMY_TABNAME", "AGR_NAME", data_dict)
+# print(json.dumps(json_data, indent=4))
