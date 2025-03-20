@@ -373,6 +373,45 @@ class dspUtils:
         if not any(updated_tables.values()):
             print("❌ No data to write.")
 
+    @staticmethod
+    def remove_column_from_replication_tasks(json_file: Path, column_name: str, output_folder: Path) -> None:
+        """
+        Removes a specified column from the "sourceObject" section within "replicationTasks".
+        Saves the modified JSON file with a "_Update" suffix in the output folder.
+        
+        :param json_file: Path to the original JSON file.
+        :param column_name: Name of the column to remove.
+        :param output_folder: Path to the folder where the updated file will be saved.
+        """
+        
+        if not json_file.exists():
+            raise FileNotFoundError(f"❌ The file does not exist: {json_file}")
+        
+        with open(json_file, "r", encoding="utf-8") as file:
+            data = json.load(file)
+        
+        try:
+            replication_tasks = data["replicationflows"].values().__iter__().__next__()["contents"]["replicationTasks"]
+        except (KeyError, StopIteration, TypeError):
+            raise ValueError("❌ Invalid JSON structure: 'replicationTasks' not found")
+        
+        for task in replication_tasks:
+            columns = task["sourceObject"]["definition"]["columns"]
+            
+            # Remove the column in-place
+            for i, col in enumerate(columns):
+                if col.get("name") == column_name:
+                    del columns[i]
+                    print(f"✅ Removed column '{column_name}' from sourceObject in {json_file.name}")
+                    break  # Stop after first match
+        
+        # Define output path and save modified JSON
+        output_file = output_folder / json_file.with_name(json_file.stem + "_Update.json").name
+        with open(output_file, "w", encoding="utf-8") as file:
+            json.dump(data, file, indent=2, ensure_ascii=False)
+        
+        print(f"✅ Updated JSON saved to: {output_file}")
+        
 if __name__ == "__main__":
     csv_file: Path = Path(r"datasphere\datasphere-tools\dsp_files\dsp_source_metadata\CSV_Test.csv")
     dspUtils.update_dsp_column_labels_from_csv(csv_file, ["TEST_ZOXB250146.json", "TEST_CLI.json"])
