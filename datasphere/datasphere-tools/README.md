@@ -1,13 +1,26 @@
 # datasphere-tools
 Tools for working with datasphere
+# Install Pyton
+https://www.python.org/downloads/
+
 # Install Node.js
+https://www.how2shout.com/how-to/how-to-install-node-js-and-npm-on-windows-10-or-11-using-cmd.html
+https://nodejs.org/en/download --> Standalone Binary
+
+# Install Datasphere CLI
+https://www.npmjs.com/package/@sap/datasphere-cli?activeTab=readme
+
+# Install Git
+https://git-scm.com/downloads/win
+winget install --id Git.Git -e --source winget
+
 # Path Variable hinzufügen!
+e.g.: --> ;C:\Users\*\node-v22.13.1-win-x64\
 ## Windows
 Regedit --> Add following to Path value if portable version of node is installed
 E.g.: C:\Users\JOHNDOE\node-v22.13.1-win-x64\
 
 # Links
-https://www.npmjs.com/package/@sap/datasphere-cli?activeTab=readme
 https://help.sap.com/docs/SAP_DATASPHERE/d0ecd6f297ac40249072a44df0549c1a/3f9a42ccde6b4b6aba121e2aab79c36d.html?locale=en-US
 
 # Datasphere Templates
