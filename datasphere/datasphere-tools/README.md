@@ -9,6 +9,10 @@ https://nodejs.org/en/download --> Standalone Binary
 
 # Install Datasphere CLI
 https://www.npmjs.com/package/@sap/datasphere-cli?activeTab=readme
+## Install / Update command
+npm install -g @sap/datasphere-cli@latest
+## Get Server Commands
+datasphere config cache init -H https://*.sap/
 
 # Install Git
 https://git-scm.com/downloads/win
